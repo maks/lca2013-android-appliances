@@ -26,17 +26,24 @@ Noun
 
     Well the dictionary says...
 
-![Images](images.png)
+![lightswitch](lightswitch1.jpg)
 
     And I mean things like this
     
-![Images](images.png)
+![microwave](microwave1.jpg)
 
     And this
     
-![Images](images.png)
+Interactive Digital Signage Appliances ?
+    
+    But in my specific case it means interactive digital signage appliances.
+    
+Interactive Digital Signage Appliances ?
+----
+![interactive-signage 1](interactive-signage-A1.jpg)
+![interactive-signage 2](interactive-signage-C1.jpg)
 
-    And this. 
+    these.
 
 Customisation
 
@@ -52,9 +59,16 @@ Customisation
     By User-level I'm talking about using the normal means that a normal app
     developer or regular device user has at their disposal
 
-2 Root
+2 Platform
 
-    This is just what it says. The main thing to note here is that with Android devices,
+    This can be thought of as a quasi root-level access to the device. Because
+    Android security model involves protecting sensitive APIs from apps that are
+    not sanctioned by the hardware vendor, only apps that are signed with the 
+    same certificate as was used when the system image was compiled from source.
+
+No <span style="text-decoration:line-through">soup</span> root for you!
+
+    The main thing to note here is that with Android devices,
     as with most other phone device OS's, is that unlike with laptops and desktops,
     the end user does not normally have nor is **intended** to have root access to the device.
     Of course anyone working in a corporate environment would already be used to this
@@ -66,7 +80,7 @@ Customisation
    the whole operating system from the source, yes wave hello to any Gentoo users out there!
    
    
-User Level Customisation
+1. User Level Customisation
 
 Things you can do...
 
@@ -76,56 +90,138 @@ Use the Home Intent
 
     Well you can use the home intent. 
     
-Small Detour - What are Intents?
+Small Detour...  
+What are Intents?
 
-    But for those that arent Android app devs, what is an Intent? Basically they
-    are an IPC mechanism, similar to DBUS. Android is actually really made up of 
-    a suite of co-operating components, bundled sometimes as applications 
-    communicating through direct and broadcast messages called Intents.
+    But for those that aren't Android app devs, what is an Intent? 
+    Basically they are an IPC mechanism, similar to DBUS. Android is actually 
+    really made up of a suite of co-operating components, bundled sometimes 
+    as applications communicating through direct and broadcast messages called 
+    Intents.
 
 Use "public API" Intents (eg. Wifi config)
     
-    Use "public API" Intents for example Wifi configuration (show demo)
+    Use "public API" Intents for example Wifi configuration.
 
-## Root Level
+Using Intents is easy!
+<pre>
+Intent intent = new Intent(WifiManager.ACTION_PICK_WIFI_NETWORK);
 
-Things you can do:
+startActivityForResult(intent, 1);
+</pre>
+    
+    This is what the code looks like to show the wifi configuration screen.
+    I kid you not, its that easy. For Java code that is super minimal!
+
+Houstin we have a problem!
+![](wifi-std-1.png)
+    
+    But using the public wifi configuration intent leaves us with a problem.
+    If our intention is to build an appliance, we dont want the user to see
+    the usual android navigation bar control, but we still need a way for them
+    to indicate they have finished setting up their wifi settings.
+    
+![](google_android_logo.jpg) ?
+    
+    But google devs must have run into the same problem when creating the setup 
+    wizard that ships on most recent android devices. And like me they must be
+    big kirk fans, because in these situations I always think...
+ 
+What would Kirk do?
+
+![](kirk-km.png)
+
+     what would Kirk do?
+     Yes thats right, change the rules of the game.
+    
+<pre>
+Intent intent = new Intent(WifiManager.ACTION_PICK_WIFI_NETWORK);
+
+<span style="color: red;">
+intent.putExtra("only_access_points", true);
+intent.putExtra("extra_prefs_show_button_bar", true);
+intent.putExtra("wifi_enable_next_on_connect", true);
+intent.putExtra("extra_prefs_set_next_text", "Finish");
+</span>
+startActivityForResult(intent, 1);
+</pre>
+    
+    And so if we look into the android source, it turns out that there are 
+    actually these strange, **undocumented**, special case parameters that you
+    can pass along with the intent code of the Wifi config application, 
+    that you can pass and ...
+
+Dada!
+
+![](wifi-custom-1.png)
+
+    and dada!
+
+2. Platform Level  
+Things you can do...
 
 * access protected APIs (eg. reboot)
-* **SILENT** OTA updates of your apps
+* __SILENT__ OTA updates of your apps
 
+    Now how can you get platform access? Well 2 ways, the first is that someone
+    liek the hardware vendor who the android system image for the device can 
+    give you the certificate used to sign it. The second way I'll talk about in 
+    a minute.
+    So once you have platform access, what can you do? Well you can call those
+    restricted system API like for rebooting the device.
+    
+Silent?
+
+    You can also call, "hidden" (ie undocumented) APIs that let you do things
+    like silently install apps or update apps on the device. By silently I mean
+    normal apps have a public api that they can call to install a new app on a 
+    device, but that then displays a onscreen prompt for the user to acknowledge
+    and allow the install to go ahead - or not. But with this hidden platform 
+    level API, you can just do it in the background with the user none the 
+    wiser.
+
+3. OS Level Customisation
+
+    So actually I lied...
 
 Actually a Trilogy in 4 parts
 
-* User
-* Root
-* OS -> __Android Framework__
-* OS -> __Kernel__
+1 User
+2 Root
+3A OS -> __Android Framework__
+3B OS -> __Kernel__
 
-    So actually I lied, theres really 2 parts to the OS-level customisation,
+    theres really 2 parts to the OS-level customisation,
     customisation at the Android Framework layer and below that at the Linux
     kernel layer.
+
+3A. OS - Android Framwork Customisation
+
+    So how do customise the android framework?
 
 AOSP and Building Android
 
 * hundreds of git repos
 * huge amounts of disk space req'd
 * min 1hr on a __very__ **fast** machine !
-* ...and then you need to build img & test on emu/device :-(
+* and then you need to build img & test on emu/device :-(
     
+    Well, you need to build is from source - hey thats what this open source gig
+    is all about sin't it?
     So building android is fairly straight forward but you have to keep in mind
     you are essentially building a whole linux distrubtion from source.
+    
+3A. OS - Android Customisation
 
-OS - Android
-
-Things you can do:
+Things you can do:  
 * choose which apps to ship
 * customise UI (eg. remove Systembar in ICS onwards)
 * choose CPU platform (eg. x86 instead of ARM)
 * workaround bugs in hardware (eg. bad LCD EDID)
-* **control** the platform - use __your own__ signing certs
+* __control__ the platform - use __your own__ signing certs
 
-    Once you get to this level, you have a whole lot of control. You can
+    Once you get to this level, you have a whole lot of control. 
+    Now before when I talked about 
 
 OS - Kernel
 
@@ -135,11 +231,16 @@ OS - Kernel
     The reasons you would do this are the same, such as adding support for an
     unusual piece of hardware like a non-HID touchscreen for example.
 
-Thank You! 
+DEMO !
 
-* blog.manichord.com
-* maks@manichord.com
-* github.com/maks
-* @mklin
+    So now I'll hopefully show you a some of the customisations I've talked 
+    about...
+
+Thank You!  
+
+blog.manichord.com  
+maks@manichord.com  
+github.com/maks  
+@mklin
 
     Thank you - any questions
