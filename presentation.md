@@ -237,6 +237,7 @@ DEMO !
     about...
 
 Thank You!  
+Questions?  
 
 blog.manichord.com  
 maks@manichord.com  
