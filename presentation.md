@@ -38,7 +38,7 @@ Interactive Digital Signage Appliances ?
     
     But in my specific case it means interactive digital signage appliances.
     
-Interactive Digital Signage Appliances ?
+Interactive Digital Signage Appliances
 ----
 ![interactive-signage 1](interactive-signage-A1.jpg)
 ![interactive-signage 2](interactive-signage-C1.jpg)
@@ -80,7 +80,7 @@ No <span style="text-decoration:line-through">soup</span> root for you!
    the whole operating system from the source, yes wave hello to any Gentoo users out there!
    
    
-1. User Level Customisation
+1 User Level Customisation
 
 Things you can do...
 
@@ -88,10 +88,10 @@ Things you can do...
 
 Use the Home Intent
 
-    Well you can use the home intent. 
+    Well you can use the home intent.
     
 Small Detour...  
-What are Intents?
+So what are Intents?
 
     But for those that aren't Android app devs, what is an Intent? 
     Basically they are an IPC mechanism, similar to DBUS. Android is actually 
@@ -99,11 +99,38 @@ What are Intents?
     as applications communicating through direct and broadcast messages called 
     Intents.
 
+Home sweet home
+![](home-screen-1.png)
+    
+    So what people think of as the home screen or "desktop" on android is really
+    nothing more than an app like any other, that has registered to listen for
+    a "well known" Intent called Home.
+    
+<pre>
+&lt;activity android:name=".MyHomeActivity"&gt;
+    &lt;intent-filter&gt;
+        &lt;action android:name="android.intent.action.MAIN" /&gt;
+        &lt;category android:name="android.intent.category.LAUNCHER" /&gt;
+        <span style='color: red'>
+        &lt;category android:name="android.intent.category.HOME"/&gt;
+        </span>
+        &lt;category android:name="android.intent.category.DEFAULT" /&gt;
+    &lt;/intent-filter&gt;
+&lt;/activity&gt;
+</pre>
+
+    Registering for receiving the Home intent (or infact any other Intent) is as
+    easy as this bit of XML configuration code.
+
 Use "public API" Intents (eg. Wifi config)
     
     Use "public API" Intents for example Wifi configuration.
 
-Using Intents is easy!
+Sending Intents is easy!
+
+    It turns out that sending Intents is pretty as easy as registering to
+    receive them.   
+    
 <pre>
 Intent intent = new Intent(WifiManager.ACTION_PICK_WIFI_NETWORK);
 
@@ -111,9 +138,9 @@ startActivityForResult(intent, 1);
 </pre>
     
     This is what the code looks like to show the wifi configuration screen.
-    I kid you not, its that easy. For Java code that is super minimal!
+    I kid you not, its that easy. For Java code that is zen like minimalism!
 
-Houstin we have a problem!
+Oops...  
 ![](wifi-std-1.png)
     
     But using the public wifi configuration intent leaves us with a problem.
@@ -127,8 +154,7 @@ Houstin we have a problem!
     wizard that ships on most recent android devices. And like me they must be
     big kirk fans, because in these situations I always think...
  
-What would Kirk do?
-
+What would Kirk do?  
 ![](kirk-km.png)
 
      what would Kirk do?
@@ -151,20 +177,19 @@ startActivityForResult(intent, 1);
     can pass along with the intent code of the Wifi config application, 
     that you can pass and ...
 
-Dada!
-
+Dada!  
 ![](wifi-custom-1.png)
 
     and dada!
 
-2. Platform Level  
-Things you can do...
+2 Platform Level  
+Things you can do...  
 
-* access protected APIs (eg. reboot)
-* __SILENT__ OTA updates of your apps
+* Call "Privilaged" APIs (eg. Reboot)  
+* *SILENT* OTA updates for your apps
 
     Now how can you get platform access? Well 2 ways, the first is that someone
-    liek the hardware vendor who the android system image for the device can 
+    like the hardware vendor who the android system image for the device can 
     give you the certificate used to sign it. The second way I'll talk about in 
     a minute.
     So once you have platform access, what can you do? Well you can call those
@@ -180,30 +205,30 @@ Silent?
     level API, you can just do it in the background with the user none the 
     wiser.
 
-3. OS Level Customisation
+3 OS Level Customisation
 
     So actually I lied...
 
-Actually a Trilogy in 4 parts
+Actually a Trilogy in 4 parts  
 
-1 User
-2 Root
-3A OS -> __Android Framework__
-3B OS -> __Kernel__
+1. User  
+2. Root  
+3. OS -> __Android Framework__  
+4. OS -> __Kernel__
 
-    theres really 2 parts to the OS-level customisation,
+    there's really 2 parts to the OS-level customisation,
     customisation at the Android Framework layer and below that at the Linux
     kernel layer.
 
-3A. OS - Android Framwork Customisation
+3 OS - Android Framwork Customisation
 
     So how do customise the android framework?
 
-AOSP and Building Android
+AOSP and Building Android  
 
-* hundreds of git repos
-* huge amounts of disk space req'd
-* min 1hr on a __very__ **fast** machine !
+* hundreds of git repos  
+* huge amounts of disk space req'd  
+* min 1hr on a __very__ **fast** machine !  
 * and then you need to build img & test on emu/device :-(
     
     Well, you need to build is from source - hey thats what this open source gig
@@ -211,14 +236,14 @@ AOSP and Building Android
     So building android is fairly straight forward but you have to keep in mind
     you are essentially building a whole linux distrubtion from source.
     
-3A. OS - Android Customisation
+4 OS - Android Customisation  
+Things you can do:..
 
-Things you can do:  
-* choose which apps to ship
-* customise UI (eg. remove Systembar in ICS onwards)
-* choose CPU platform (eg. x86 instead of ARM)
-* workaround bugs in hardware (eg. bad LCD EDID)
-* __control__ the platform - use __your own__ signing certs
+* choose which apps to ship  
+* customise UI (eg. remove Systembar in ICS)  
+* choose CPU platform (eg. x86 instead of ARM)  
+* workaround bugs in hardware (eg. bad LCD EDID)  
+* *control* the platform - use __your own__ signing certs
 
     Once you get to this level, you have a whole lot of control. 
     Now before when I talked about 
@@ -226,8 +251,9 @@ Things you can do:
 OS - Kernel
 
 * device drivers, eg. non-HID touchscreens
+* ...?
 
-    This is just liek building a custom kernel for your favourite desktop distro.
+    This is just like building a custom kernel for your favourite desktop distro.
     The reasons you would do this are the same, such as adding support for an
     unusual piece of hardware like a non-HID touchscreen for example.
 
